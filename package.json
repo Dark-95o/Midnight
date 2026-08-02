@@ -1,0 +1,20 @@
+{
+  "name": "cloakpass-monorepo",
+  "private": true,
+  "workspaces": [
+    "contract",
+    "indexer",
+    "ui"
+  ],
+  "scripts": {
+    "test": "npm test --workspace=contract && npm test --workspace=ui",
+    "dev:ui": "npm run dev --workspace=ui",
+    "start:indexer": "npm run start --workspace=indexer"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3"
+  }
+}
