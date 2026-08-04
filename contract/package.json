@@ -1,0 +1,12 @@
+{
+  "name": "cloakpass-contract",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.5",
+    "typescript": "^5.2.2"
+  }
+}
