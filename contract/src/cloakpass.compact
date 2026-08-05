@@ -1,0 +1,68 @@
+pragma language_version >= 0.21.0;
+import CompactStandardLibrary;
+
+export contract CloakPass {
+    // Public ledger state stored on-chain
+    export ledger admin_pubkey: Bytes<32>;
+    export ledger commitments: MerkleTree<4, Bytes<32>>;
+    export ledger access_granted_events: Map<Bytes<32>, Boolean>;
+    export ledger access_granted_count: Uint<32>;
+
+    // Constructor to initialize the contract with an admin public key
+    constructor(admin_pk: Bytes<32>) {
+        admin_pubkey = admin_pk;
+        access_granted_count = 0;
+    }
+
+    // Witness signatures for private member data (handled off-chain)
+    witness get_secret(): Bytes<32>;
+    witness get_membership_proof(): MerkleTreePath<4, Bytes<32>>;
+
+    // Admin witness for authenticating registration (handled off-chain)
+    witness get_admin_secret(): Bytes<32>;
+
+    // Circuit for Admin to register a new leaf commitment
+    export circuit register_commitment(commitment: Bytes<32>): Void {
+        // 1. Authenticate admin by proving knowledge of the admin secret key
+        let admin_sk = get_admin_secret();
+        let derived_admin_pk = persistentHash<Vector<2, Bytes<32>>>([
+            pad(32, "cloakpass:admin:v1"),
+            admin_sk
+        ]);
+        assert(derived_admin_pk == admin_pubkey, "Unauthorized: Caller is not the admin");
+
+        // 2. Insert the commitment leaf into the Merkle tree
+        commitments.insert(commitment);
+    }
+
+    // Circuit for User to claim access anonymously and record it on the public ledger
+    export circuit prove_membership(event_id: Bytes<32>): Void {
+        // Ensure this event has not been claimed yet to prevent replays
+        assert(!access_granted_events.member(event_id), "Access already claimed for this event");
+
+        // 1. Retrieve the private secret key from the off-chain witness
+        let secret = get_secret();
+
+        // 2. Compute the commitment leaf using persistent hashing
+        let commitment = persistentHash<Vector<2, Bytes<32>>>([
+            pad(32, "cloakpass:commitment:v1"),
+            secret
+        ]);
+
+        // 3. Retrieve the Merkle membership proof path from the off-chain witness
+        let path = get_membership_proof();
+
+        // 4. Assert that the commitment matches the leaf declared in the path
+        assert(path.leaf == commitment, "Preimage does not match path leaf");
+
+        // 5. Derive the Merkle root from the leaf and sibling path entries
+        let calculated_root = merkleTreePathRoot<4, Bytes<32>>(path);
+
+        // 6. Assert that the derived root is valid in the ledger's commitments tree
+        assert(commitments.checkRoot(calculated_root), "Invalid Merkle proof");
+
+        // 7. Record the event on the ledger to prevent double-claiming, and increment count
+        access_granted_events.insert(event_id, true);
+        access_granted_count = (access_granted_count + 1) as Uint<32>;
+    }
+}
