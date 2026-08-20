@@ -2,7 +2,10 @@
 
 CloakPass is a decentralized, privacy-preserving gatekeeper application (dApp) built on the Midnight blockchain. It allows users to prove membership in a private allowlist using Zero-Knowledge proofs without disclosing their wallet address, identity, or transaction history.
 
-[![CloakPass CI/CD](https://github.com/cloakpass/cloakpass-monorepo/actions/workflows/ci.yml/badge.svg)](https://github.com/cloakpass/cloakpass-monorepo/actions)
+
+https://github.com/user-attachments/assets/77ae0f3f-1866-4470-a4ba-3c0a11cef0bb
+
+
 
 ---
 
@@ -139,7 +142,7 @@ Indexer endpoints will be active on [http://localhost:4000/api/events](http://lo
 
 ### User Interface (Red & Yellow Glassmorphism Dashboard)
 *Prove membership privately or manage commitments with custom wallet connections.*
-![alt text](image.png)
+<img width="1841" height="1088" alt="Screenshot 2026-08-20 144805" src="https://github.com/user-attachments/assets/0ba17137-b3d4-4e9e-9f9b-666e7ff37b2b" />
 
 ### Automated Test Suite (Vitest)
 *Passing comprehensive test cases verifying allowlist boundaries and privacy integrity.*
@@ -147,4 +150,6 @@ Indexer endpoints will be active on [http://localhost:4000/api/events](http://lo
 
 ### CI/CD Pipeline (GitHub Actions)
 *Automated builds and tests run seamlessly on pushes and pull requests.*
-![GitHub Actions CI Pipeline](.github/workflows/ci.yml)
+<img width="1826" height="856" alt="Screenshot 2026-08-20 143621" src="https://github.com/user-attachments/assets/b5a6c360-8c2a-4bbc-9678-302dbeca2636" />
+
+
