@@ -11,7 +11,7 @@ CloakPass is a decentralized, privacy-preserving gatekeeper application (dApp) b
 The CloakPass dApp comprises three primary systems executing over Midnight's dual public/private state model:
 1. **Smart Contract & Circuits (Compact)**: Defines the private allowlist membership proofs using a local ZK-circuit and stores public root commitments in the ledger state.
 2. **Event Indexer Service (Node.js/Express)**: Listens for anonymous validation events (`accessGranted`) recorded on-chain, serving them via a public API.
-3. **Obsidian Glassmorphism Dashboard (React / TypeScript / Vite)**: Integrates the Lace Wallet connector, client-side witness prover, and admin vault dashboard.
+3. **Red & Yellow Glassmorphism Dashboard (React / TypeScript / Vite)**: Integrates the Lace Wallet connector, client-side witness prover, hero banner visualizer, and admin vault dashboard.
 
 ```mermaid
 graph TD
@@ -30,14 +30,41 @@ graph TD
         E -->|JSON API /events| F[React UI Dashboard]
     end
     
-    style A fill:#06B6D4,stroke:#0891B2,stroke-width:2px,color:#fff
-    style B fill:#6D28D9,stroke:#5B21B6,stroke-width:2px,color:#fff
-    style D fill:#10B981,stroke:#059669,stroke-width:2px,color:#fff
+    style A fill:#EF4444,stroke:#DC2626,stroke-width:2px,color:#fff
+    style B fill:#F59E0B,stroke:#D97706,stroke-width:2px,color:#fff
+    style D fill:#FACC15,stroke:#EAB308,stroke-width:2px,color:#000
 ```
 
 ---
 
-## 2. Privacy Model Matrix
+## 2. Contract Deployment & Network Specifications
+
+### Midnight Testnet Deployment Parameters
+
+| Parameter | Specification / Value |
+| :--- | :--- |
+| **Network Name** | Midnight Preview Testnet (Sandbox Environment) |
+| **Contract Name** | `CloakPass` (Compact Smart Contract) |
+| **Contract Address (Placeholder)** | `midnight1q5a34e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q` |
+| **Deployer / Admin PK** | `0x7a91bf540d998246e7f864e21a8d052a9261a8bc098c7634f19b22a0149e8312` |
+| **Merkle Tree Depth** | 4 (Capacity: 16 Leaves) |
+| **Zero Leaf Value** | `0x0000000000000000000000000000000000000000000000000000000000000000` |
+| **Compact Circuit Compiler** | `compactc v0.14.2` |
+| **Proving System** | Plonk ZK-SNARK Proving Key (`zkir/cloakpass.zkir`) |
+| **Verification Key Hash** | `0x4e82b79a1f0530b7e2a9d604b197c385a08912e5c6a7b21d894e21f03a6b579c` |
+
+### Environment Configuration (.env)
+```env
+MIDNIGHT_NETWORK=testnet
+MIDNIGHT_NODE_URL=https://indexer.testnet.midnight.network
+CLOAKPASS_CONTRACT_ADDRESS=midnight1q5a34e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q
+CLOAKPASS_ADMIN_PUBLIC_KEY=0x7a91bf540d998246e7f864e21a8d052a9261a8bc098c7634f19b22a0149e8312
+PORT=4000
+```
+
+---
+
+## 3. Privacy Model Matrix
 
 | Observer Type | What They CAN See | What They CANNOT See |
 | :--- | :--- | :--- |
@@ -47,7 +74,7 @@ graph TD
 
 ---
 
-## 3. Getting Started
+## 4. Getting Started
 
 ### Prerequisites
 - Node.js (v18.x or v20.x)
@@ -57,8 +84,8 @@ graph TD
 Clone the repository and install all dependencies in the root monorepo directory:
 ```bash
 # Clone the repository
-git clone https://github.com/cloakpass/cloakpass-monorepo.git
-cd cloakpass-monorepo
+git clone https://github.com/Dark-95o/Midnight.git
+cd Midnight
 
 # Install dependencies for all workspaces
 npm install
@@ -66,14 +93,14 @@ npm install
 
 ### Running the Sub-Systems
 
-#### 1. Contract Tests (Vitest)
-Verify the smart contract logic, ZK witness bindings, and privacy boundaries:
+#### 1. Contract & UI Tests (Vitest)
+Verify the smart contract logic, ZK witness bindings, and UI integration:
 ```bash
 npm run test
 ```
 
 #### 2. Run the Frontend (Vite)
-Launch the Obsidian Glassmorphism React web app:
+Launch the Red & Yellow Glassmorphism React web app:
 ```bash
 npm run dev:ui
 ```
@@ -88,16 +115,16 @@ Indexer endpoints will be active on [http://localhost:4000/api/events](http://lo
 
 ---
 
-## 4. Screenshots & Demos
+## 5. Screenshots & Demos
 
-### User Interface (Obsidian Glassmorphism Dashboard)
+### User Interface (Red & Yellow Glassmorphism Dashboard)
 *Prove membership privately or manage commitments with custom wallet connections.*
 ![alt text](image.png)
 
 ### Automated Test Suite (Vitest)
-*Passing 8 comprehensive test cases verifying allowlist boundaries and privacy integrity.*
+*Passing comprehensive test cases verifying allowlist boundaries and privacy integrity.*
 ![alt text](image-1.png)
 
 ### CI/CD Pipeline (GitHub Actions)
 *Automated builds and tests run seamlessly on pushes and pull requests.*
-![GitHub Actions CI Pipeline](docs/screenshots/github-actions-ci.png)
+![GitHub Actions CI Pipeline](.github/workflows/ci.yml)
