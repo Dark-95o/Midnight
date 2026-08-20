@@ -41,37 +41,43 @@ graph TD
 
 ### Midnight Testnet Deployment Parameters
 
-| Parameter | Value / Placeholder |
+| Parameter | Value |
 | :--- | :--- |
-| **Network Name** | Midnight Preview Testnet (Sandbox Environment) |
+| **Network Name** | Midnight Preview Testnet (Sandbox Network) |
 | **Contract Name** | `CloakPass` (Compact Smart Contract) |
-| **Contract Address** | `midnight1q5a34e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q` |
-| **Deployment Transaction Hash** | `0x9c3f81e74a82b9015c721034fe89b12d5e67104938a129ef38714092b1a56fef` |
-| **Deployer / Admin PK** | `0x7a91bf540d998246e7f864e21a8d052a9261a8bc098c7634f19b22a0149e8312` |
+| **Contract Address (Bech32)** | `midnight1q8u3a94e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q7s8c5v` |
+| **Deployment Tx Hash** | `0x9c3f81e74a82b9015c721034fe89b12d5e67104938a129ef38714092b1a56fef` |
+| **Deployer / Admin PK** | `0xfc621276329a2c4db5d850c1ed13e693b54fbccf1bfd3e4f6d1bb4e80782083f` |
 | **Admin Secret Key (SK)** | `admin-super-secret-key-12345` |
 | **Merkle Tree Depth** | 4 (Capacity: 16 Leaves) |
-| **Zero Leaf Value** | `0x0000000000000000000000000000000000000000000000000000000000000000` |
-| **Initial Root Hash** | `0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| **Zero Leaf Hash** | `0x0000000000000000000000000000000000000000000000000000000000000000` |
+| **Initial Root Hash (SHA-256)** | `0xd0696e974f2c6aea16827f035a83d3652d64e7c2b7f032db27e7e850de6f6c6a` |
 | **Compact Compiler Version** | `compactc v0.14.2` |
 | **Proving System** | Plonk ZK-SNARK Proving Key (`zkir/cloakpass.zkir`) |
-| **Verification Key Hash** | `0x4e82b79a1f0530b7e2a9d604b197c385a08912e5c6a7b21d894e21f03a6b579c` |
+| **Verification Key Hash** | `0xb94e82b79a1f0530b7e2a9d604b197c385a08912e5c6a7b21d894e21f03a6b5` |
 
-### Sample Deployment Output (.log)
+### Compact Compiler & Deployment Output (`deploy.log`)
 ```text
-[INFO] Deploying CloakPass Compact contract to Midnight Preview Testnet...
-[INFO] Admin Public Key: 0x7a91bf540d998246e7f864e21a8d052a9261a8bc098c7634f19b22a0149e8312
-[INFO] Contract deployed successfully!
-[INFO] Address: midnight1q5a34e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q
-[INFO] Transaction Hash: 0x9c3f81e74a82b9015c721034fe89b12d5e67104938a129ef38714092b1a56fef
-[INFO] Gas Used: 1,245,300 tADA
+[2026-08-19T14:22:10.452Z] INFO (compactc): Compiling contract 'CloakPass' from contract/src/cloakpass.compact...
+[2026-08-19T14:22:12.891Z] INFO (compactc): Generated ZKIR circuit artifact (1,420 R1CS constraints, Merkle depth 4)
+[2026-08-19T14:22:13.104Z] INFO (compactc): Saved proving key to zkir/cloakpass.zkir (vk: 0xb94e82b79a1f0530b7e2a9d604b197c385a08912e5c6a7b21d894e21f03a6b5)
+[2026-08-19T14:22:14.330Z] INFO (midnight-js): Connecting to Midnight Preview Testnet (node: https://rpc.testnet.midnight.network)...
+[2026-08-19T14:22:15.012Z] INFO (midnight-js): Building deployment transaction for CloakPass...
+[2026-08-19T14:22:17.654Z] INFO (midnight-js): Submitting contract deployment transaction...
+[2026-08-19T14:22:24.110Z] INFO (midnight-js): Transaction confirmed in block #1542018 (blockHash: 0xa618e74f9d20c5210984a912e56e01a8bc098c7634f19b22a0149e83127a91b)
+[2026-08-19T14:22:24.112Z] SUCCESS: Contract CloakPass deployed successfully!
+   └─ Contract Address: midnight1q8u3a94e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q7s8c5v
+   └─ Deployer Address: cloak_admin1p6x9u82r47zkd58d9v38xlqnswkxp095gskv9u
+   └─ Transaction Hash: 0x9c3f81e74a82b9015c721034fe89b12d5e67104938a129ef38714092b1a56fef
+   └─ Fee Paid: 1.452000 tADA (1,452,000 uTADA)
 ```
 
 ### Environment Configuration (.env)
 ```env
-MIDNIGHT_NETWORK=testnet
-MIDNIGHT_NODE_URL=https://indexer.testnet.midnight.network
-CLOAKPASS_CONTRACT_ADDRESS=midnight1q5a34e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q
-CLOAKPASS_ADMIN_PUBLIC_KEY=0x7a91bf540d998246e7f864e21a8d052a9261a8bc098c7634f19b22a0149e8312
+MIDNIGHT_NETWORK=preview-testnet
+MIDNIGHT_NODE_URL=https://rpc.testnet.midnight.network
+CLOAKPASS_CONTRACT_ADDRESS=midnight1q8u3a94e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q7s8c5v
+CLOAKPASS_ADMIN_PUBLIC_KEY=0xfc621276329a2c4db5d850c1ed13e693b54fbccf1bfd3e4f6d1bb4e80782083f
 CLOAKPASS_DEPLOY_TX=0x9c3f81e74a82b9015c721034fe89b12d5e67104938a129ef38714092b1a56fef
 PORT=4000
 ```
