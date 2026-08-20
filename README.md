@@ -2,7 +2,10 @@
 
 CloakPass is a decentralized, privacy-preserving gatekeeper application (dApp) built on the Midnight blockchain. It allows users to prove membership in a private allowlist using Zero-Knowledge proofs without disclosing their wallet address, identity, or transaction history.
 
-[![CloakPass CI/CD](https://github.com/cloakpass/cloakpass-monorepo/actions/workflows/ci.yml/badge.svg)](https://github.com/cloakpass/cloakpass-monorepo/actions)
+
+
+https://github.com/user-attachments/assets/fdb393b2-79b6-45e3-bd9a-95b4abf8c6b6
+
 
 ---
 
