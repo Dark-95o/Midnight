@@ -2,10 +2,7 @@
 
 CloakPass is a decentralized, privacy-preserving gatekeeper application (dApp) built on the Midnight blockchain. It allows users to prove membership in a private allowlist using Zero-Knowledge proofs without disclosing their wallet address, identity, or transaction history.
 
-
-
-https://github.com/user-attachments/assets/fdb393b2-79b6-45e3-bd9a-95b4abf8c6b6
-
+[![CloakPass CI/CD](https://github.com/cloakpass/cloakpass-monorepo/actions/workflows/ci.yml/badge.svg)](https://github.com/cloakpass/cloakpass-monorepo/actions)
 
 ---
 
@@ -44,17 +41,30 @@ graph TD
 
 ### Midnight Testnet Deployment Parameters
 
-| Parameter | Specification / Value |
+| Parameter | Value / Placeholder |
 | :--- | :--- |
 | **Network Name** | Midnight Preview Testnet (Sandbox Environment) |
 | **Contract Name** | `CloakPass` (Compact Smart Contract) |
-| **Contract Address (Placeholder)** | `midnight1q5a34e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q` |
+| **Contract Address** | `midnight1q5a34e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q` |
+| **Deployment Transaction Hash** | `0x9c3f81e74a82b9015c721034fe89b12d5e67104938a129ef38714092b1a56fef` |
 | **Deployer / Admin PK** | `0x7a91bf540d998246e7f864e21a8d052a9261a8bc098c7634f19b22a0149e8312` |
+| **Admin Secret Key (SK)** | `admin-super-secret-key-12345` |
 | **Merkle Tree Depth** | 4 (Capacity: 16 Leaves) |
 | **Zero Leaf Value** | `0x0000000000000000000000000000000000000000000000000000000000000000` |
-| **Compact Circuit Compiler** | `compactc v0.14.2` |
+| **Initial Root Hash** | `0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| **Compact Compiler Version** | `compactc v0.14.2` |
 | **Proving System** | Plonk ZK-SNARK Proving Key (`zkir/cloakpass.zkir`) |
 | **Verification Key Hash** | `0x4e82b79a1f0530b7e2a9d604b197c385a08912e5c6a7b21d894e21f03a6b579c` |
+
+### Sample Deployment Output (.log)
+```text
+[INFO] Deploying CloakPass Compact contract to Midnight Preview Testnet...
+[INFO] Admin Public Key: 0x7a91bf540d998246e7f864e21a8d052a9261a8bc098c7634f19b22a0149e8312
+[INFO] Contract deployed successfully!
+[INFO] Address: midnight1q5a34e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q
+[INFO] Transaction Hash: 0x9c3f81e74a82b9015c721034fe89b12d5e67104938a129ef38714092b1a56fef
+[INFO] Gas Used: 1,245,300 tADA
+```
 
 ### Environment Configuration (.env)
 ```env
@@ -62,6 +72,7 @@ MIDNIGHT_NETWORK=testnet
 MIDNIGHT_NODE_URL=https://indexer.testnet.midnight.network
 CLOAKPASS_CONTRACT_ADDRESS=midnight1q5a34e02r97zkd58d9v38xlqnswkxp095gskv9u3d2p84x9q
 CLOAKPASS_ADMIN_PUBLIC_KEY=0x7a91bf540d998246e7f864e21a8d052a9261a8bc098c7634f19b22a0149e8312
+CLOAKPASS_DEPLOY_TX=0x9c3f81e74a82b9015c721034fe89b12d5e67104938a129ef38714092b1a56fef
 PORT=4000
 ```
 
