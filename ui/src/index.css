@@ -1,14 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-obsidian: #0A0B0E;
-  --color-cyberCyan: #06B6D4;
-  --color-midnightViolet: #6D28D9;
+  --color-cream-bg: #FAF7F2;
+  --color-cream-card: #FFFDF9;
+  --color-cream-card-alt: #F3EEE6;
+  --color-cream-border: #E5DFD5;
+  --color-cream-border-dark: #D4CBBE;
+  --color-espresso: #1C1917;
+  --color-taupe: #57534E;
+  --color-terracotta: #C2410C;
+  --color-amber-warm: #B45309;
 }
 
 :root {
-  background-color: #0A0B0E;
-  color: #F3F4F6;
+  background-color: #FAF7F2;
+  color: #1C1917;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
@@ -16,30 +22,62 @@ body {
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
-  background-attachment: fixed;
+  background-color: #FAF7F2;
+  background-image: radial-gradient(#E8E2D8 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: #1C1917;
 }
 
-/* Glassmorphism panel styling */
+/* Cream Editorial Card Styling */
+.cream-card {
+  background-color: #FFFDF9;
+  border: 1px solid #E5DFD5;
+  box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.05), 0 2px 6px -1px rgba(28, 25, 23, 0.03);
+}
+
+.cream-card-highlight {
+  background-color: #FFFDF9;
+  border: 1px solid #C2410C;
+  box-shadow: 0 4px 20px -2px rgba(194, 65, 12, 0.08);
+}
+
+.cream-card-subtle {
+  background-color: #F4EFE6;
+  border: 1px solid #E5DFD5;
+}
+
+/* Re-map legacy glass-panel classes to clean cream cards for backwards compatibility */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  background-color: #FFFDF9;
+  border: 1px solid #E5DFD5;
+  box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.05);
 }
 
-/* Cyber Glows */
-.cyan-glow {
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+.glass-panel-red {
+  background-color: #FDF4F0;
+  border: 1px solid #F87171;
+  box-shadow: 0 2px 10px rgba(194, 65, 12, 0.06);
 }
 
-.purple-glow {
-  box-shadow: 0 0 20px rgba(109, 40, 217, 0.2);
+.glass-panel-yellow {
+  background-color: #FEFCE8;
+  border: 1px solid #F59E0B;
+  box-shadow: 0 2px 10px rgba(180, 83, 9, 0.06);
 }
 
-/* Custom terminal glowing text */
-.terminal-glow {
-  text-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+/* Typography Helpers */
+.editorial-title {
+  color: #1C1917;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.terracotta-text {
+  color: #C2410C;
+}
+
+.amber-text {
+  color: #B45309;
 }
 
 /* Custom scrollbars */
@@ -49,14 +87,15 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
+  background: #F3EEE6;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: #D4CBBE;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #B45309;
 }
+

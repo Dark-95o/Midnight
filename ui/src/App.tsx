@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Wallet, Info, Sparkles, RefreshCw, Cpu } from 'lucide-react';
+import { Shield, Wallet, Info, Sparkles, RefreshCw, Cpu, ShieldCheck, Lock, Server } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeroVisualizer } from './components/HeroVisualizer';
 import { MemberAccess } from './components/MemberAccess';
@@ -18,7 +18,7 @@ export default function App() {
   // Wallet Connection Simulation
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletConnecting, setWalletConnecting] = useState(false);
-  const [walletRole, setWalletRole] = useState<'admin' | 'user'>('user'); // admin or user
+  const [walletRole, setWalletRole] = useState<'admin' | 'user'>('user');
   const [walletAddress, setWalletAddress] = useState('');
   const [walletBalance, setWalletBalance] = useState('500.00');
   const [walletType, setWalletType] = useState<'lace' | 'freighter' | 'mock' | null>(null);
@@ -47,7 +47,7 @@ export default function App() {
   const handleWalletSelect = async (type: 'lace' | 'freighter' | 'mock') => {
     setShowWalletModal(false);
     setWalletConnecting(true);
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((r) => setTimeout(r, 1000));
     setWalletConnected(true);
     setWalletConnecting(false);
     setWalletType(type);
@@ -94,14 +94,12 @@ export default function App() {
     logEvent('access', 'Wallet disconnected.');
   };
 
-  // Listen to role changes and update wallet details
   useEffect(() => {
     if (walletConnected && walletType) {
       updateWalletState(walletType, walletRole);
     }
   }, [walletRole, walletConnected, walletType]);
 
-  // Log terminal activity helper
   const logEvent = (type: 'access' | 'registration', details: string) => {
     const newEvent: TerminalEvent = {
       id: Math.random().toString(),
@@ -114,7 +112,6 @@ export default function App() {
     setTerminalEvents((prev) => [newEvent, ...prev]);
   };
 
-  // Clear/Reset entire Ledger State
   const clearLedgerState = () => {
     cloakPassSim.commitments.leaves = cloakPassSim.commitments.leaves.map(
       () => '0000000000000000000000000000000000000000000000000000000000000000'
@@ -130,23 +127,18 @@ export default function App() {
     logEvent('registration', 'Contract ledger re-initialized to initial empty state.');
   };
 
-  // Register commitment off-chain and on-chain
   const handleRegisterCommitment = async (secret: string): Promise<{ success: boolean; commitment?: string; error?: string }> => {
     try {
-      // Calculate commitment
       const commitment = hashValues([pad32('cloakpass:commitment:v1'), secret]);
 
-      // Set admin witness
       cloakPassSim.registerWitnesses({
         get_admin_secret: () => ADMIN_SK,
         get_secret: () => '',
         get_membership_proof: () => ({ leaf: '', path: [] })
       });
 
-      // Execute on-chain
       cloakPassSim.register_commitment(commitment);
       
-      // Update state
       setCommitments([...cloakPassSim.commitments.leaves]);
       logEvent('registration', `Admin registered new commitment leaf: ${commitment.substring(0, 16)}...`);
       return { success: true, commitment };
@@ -155,20 +147,18 @@ export default function App() {
     }
   };
 
-  // User proves membership
   const handleProveMembership = async (secret: string): Promise<{ success: boolean; eventId?: string; error?: string }> => {
     setCurrentSecret(secret);
     setIsGenerating(true);
-    setProvingStep(1); // Witness Generation
+    setProvingStep(1);
 
     await new Promise((r) => setTimeout(r, 1200));
-    setProvingStep(2); // Circuit Computation
+    setProvingStep(2);
 
     await new Promise((r) => setTimeout(r, 1500));
-    setProvingStep(3); // Shielded TX Submission
+    setProvingStep(3);
 
     try {
-      // Find the index of the commitment of this secret in the Merkle Tree
       const commitment = hashValues([pad32('cloakpass:commitment:v1'), secret]);
       const leafIndex = cloakPassSim.commitments.leaves.findIndex((c) => c === commitment);
 
@@ -176,21 +166,17 @@ export default function App() {
         throw new Error('Secret is not registered in the allowlist commitments tree.');
       }
 
-      // Generate Merkle path
       const path = cloakPassSim.commitments.getPath(leafIndex);
 
-      // Register witness callbacks
       cloakPassSim.registerWitnesses({
         get_admin_secret: () => '',
         get_secret: () => secret,
         get_membership_proof: () => path
       });
 
-      // Call circuit
       const eventId = hashValues([`session-${Date.now()}`]);
       cloakPassSim.prove_membership(eventId);
 
-      // Update state
       setAccessCount(cloakPassSim.access_granted_count);
       setLastEventId(eventId);
       setIsVerified(true);
@@ -205,32 +191,30 @@ export default function App() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-obsidian text-white relative font-sans overflow-x-hidden pb-12 selection:bg-cyberCyan/30 selection:text-cyberCyan">
-      
-      {/* Background Neon Gradients */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-cyberCyan/5 to-transparent rounded-full blur-[140px] pointer-events-none"></div>
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-gradient-to-br from-midnightViolet/5 to-transparent rounded-full blur-[140px] pointer-events-none"></div>
+  const activeLeavesCount = commitments.filter(c => c !== '0000000000000000000000000000000000000000000000000000000000000000').length;
 
+  return (
+    <div className="min-h-screen bg-[#FAF7F2] text-[#1C1917] font-sans overflow-x-hidden pb-16 selection:bg-[#E5DFD5] selection:text-[#C2410C]">
+      
       {/* TOP NAVIGATION BAR */}
-      <header className="border-b border-white/5 bg-obsidian/60 backdrop-blur-xl sticky top-0 z-50">
+      <header className="border-b border-[#E5DFD5] bg-[#FFFDF9]/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyberCyan to-midnightViolet flex items-center justify-center shadow-lg cyan-glow">
-              <Shield className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#C2410C] flex items-center justify-center shadow-sm p-0.5">
+              <ShieldCheck className="w-5 h-5 text-white" />
             </div>
             <div>
-              <div className="text-base font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent flex items-center gap-1.5">
-                CloakPass <span className="text-[10px] bg-cyberCyan/20 text-cyberCyan px-1.5 py-0.5 rounded font-mono uppercase tracking-widest border border-cyberCyan/20">ZK-Gate</span>
+              <div className="text-xl font-extrabold tracking-tight text-[#1C1917] flex items-center gap-2">
+                CloakPass <span className="text-[10px] bg-[#F3EEE6] text-[#C2410C] px-2.5 py-0.5 rounded-full font-mono uppercase tracking-wider border border-[#E5DFD5] font-bold">Midnight ZK</span>
               </div>
-              <span className="text-[10px] text-white/40 block leading-none">Midnight Protocol allowed-member verifier</span>
+              <span className="text-[11px] text-[#57534E] block leading-none font-mono">Shielded Access Gatekeeper</span>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
             {/* Network Pill */}
-            <div className="hidden sm:flex items-center gap-1.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-xs font-semibold text-white/70">
-              <span className="w-2 h-2 rounded-full bg-cyberCyan animate-pulse"></span>
+            <div className="hidden sm:flex items-center gap-2 bg-[#F3EEE6] border border-[#E5DFD5] px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold text-[#57534E]">
+              <span className="w-2 h-2 rounded-full bg-[#15803D]"></span>
               Midnight Testnet
             </div>
 
@@ -244,9 +228,9 @@ export default function App() {
                   exit={{ opacity: 0 }}
                   onClick={connectWallet}
                   disabled={walletConnecting}
-                  className="bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
+                  className="bg-[#C2410C] hover:bg-[#9A3412] text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 active:scale-[0.98] transition-all shadow-sm disabled:opacity-50"
                 >
-                  <Wallet className="w-4 h-4 text-cyberCyan" />
+                  <Wallet className="w-4 h-4 stroke-[2.5]" />
                   {walletConnecting ? 'Connecting...' : 'Connect Wallet'}
                 </motion.button>
               ) : (
@@ -255,16 +239,16 @@ export default function App() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex items-center gap-3 bg-white/5 border border-cyberCyan/20 pl-3 pr-2 py-1.5 rounded-xl text-xs"
+                  className="flex items-center gap-3 bg-[#F3EEE6] border border-[#E5DFD5] pl-3.5 pr-2 py-1.5 rounded-xl text-xs"
                 >
-                  <div className="text-right">
-                    <span className="text-[9px] text-white/40 block">Balance ({walletType?.toUpperCase()}):</span>
-                    <span className="font-mono font-bold text-cyberCyan">{walletBalance}</span>
+                  <div className="text-right font-mono">
+                    <span className="text-[9px] text-[#57534E] block">Balance ({walletType?.toUpperCase()}):</span>
+                    <span className="font-bold text-[#C2410C]">{walletBalance}</span>
                   </div>
-                  <div className="h-6 w-px bg-white/10"></div>
+                  <div className="h-6 w-px bg-[#E5DFD5]"></div>
                   <button
                     onClick={disconnectWallet}
-                    className="hover:text-red-400 font-mono text-[10px] text-white/70 transition-colors uppercase font-bold tracking-wider"
+                    className="hover:text-[#C2410C] font-mono text-[10px] text-[#57534E] transition-colors uppercase font-bold tracking-wider"
                   >
                     {walletAddress.substring(0, 6)}...{walletAddress.substring(walletAddress.length - 4)}
                   </button>
@@ -275,196 +259,266 @@ export default function App() {
         </div>
       </header>
 
-      {/* MAIN CONTAINER */}
-      <main className="max-w-7xl mx-auto px-6 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+      {/* MAIN LAYOUT */}
+      <main className="max-w-7xl mx-auto px-6 mt-8 space-y-8 relative z-10">
         
-        {/* LEFT COLUMN: HERO VISUALIZER & PUBLIC TERMINAL */}
-        <div className="lg:col-span-8 space-y-8">
-          
-          {/* Welcome Intro */}
-          <div className="space-y-2">
-            <h1 className="text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
-              Private Zero-Knowledge Gatekeeper <Sparkles className="w-6 h-6 text-cyberCyan animate-pulse" />
-            </h1>
-            <p className="text-sm text-white/50 leading-relaxed max-w-2xl">
-              CloakPass enables members to prove eligibility to private portals in full privacy. Midnight's dual-state architecture verifies structural inclusion while masking addresses and transactions.
-            </p>
+        {/* EDITORIAL HERO OVERVIEW SHOWCASE CARD (NO IMAGES) */}
+        <div className="cream-card rounded-3xl p-8 md:p-10 border border-[#E5DFD5] shadow-sm relative overflow-hidden bg-[#FFFDF9]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            
+            {/* Banner Left Info Column */}
+            <div className="lg:col-span-7 space-y-5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F3EEE6] border border-[#E5DFD5] text-[#C2410C] font-mono text-xs font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-[#C2410C]" /> Next-Gen Shielded Access Verification
+              </div>
+
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#1C1917] leading-tight">
+                Zero-Knowledge Privacy Gateway
+              </h1>
+
+              <p className="text-sm text-[#57534E] leading-relaxed max-w-xl">
+                CloakPass decouples user identity from membership validation. Verify access rights to private resources using Midnight Compact ZK-SNARK circuits without revealing your address or key.
+              </p>
+
+              {/* Stats Counters Grid */}
+              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#E5DFD5]">
+                <div className="bg-[#F4EFE6] p-3.5 rounded-2xl border border-[#E5DFD5]">
+                  <span className="text-[10px] text-[#57534E] font-mono block uppercase tracking-wider font-semibold">Active Tree Leaves</span>
+                  <span className="text-xl font-bold text-[#1C1917] font-mono mt-0.5 block">{activeLeavesCount} / 16</span>
+                </div>
+                <div className="bg-[#F4EFE6] p-3.5 rounded-2xl border border-[#E5DFD5]">
+                  <span className="text-[10px] text-[#57534E] font-mono block uppercase tracking-wider font-semibold">Verified Proofs</span>
+                  <span className="text-xl font-bold text-[#C2410C] font-mono mt-0.5 block">{accessCount}</span>
+                </div>
+                <div className="bg-[#F4EFE6] p-3.5 rounded-2xl border border-[#E5DFD5]">
+                  <span className="text-[10px] text-[#57534E] font-mono block uppercase tracking-wider font-semibold">Circuit Protocol</span>
+                  <span className="text-xl font-bold text-[#B45309] font-mono mt-0.5 block">Compact ZK</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Banner Right Technical Overview Grid (Replacing Image) */}
+            <div className="lg:col-span-5 bg-[#F4EFE6] rounded-2xl p-6 border border-[#E5DFD5] space-y-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#57534E] flex items-center gap-2 border-b border-[#E5DFD5] pb-3">
+                <Server className="w-4 h-4 text-[#C2410C]" /> Protocol Specifications
+              </h3>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-[#FFFDF9] p-3 rounded-xl border border-[#E5DFD5] space-y-1">
+                  <span className="text-[10px] text-[#78716C] font-mono block">Merkle Tree</span>
+                  <span className="font-bold text-[#1C1917]">Depth 4 (16 Slots)</span>
+                </div>
+                <div className="bg-[#FFFDF9] p-3 rounded-xl border border-[#E5DFD5] space-y-1">
+                  <span className="text-[10px] text-[#78716C] font-mono block">Prover System</span>
+                  <span className="font-bold text-[#1C1917]">Plonk ZK-SNARK</span>
+                </div>
+                <div className="bg-[#FFFDF9] p-3 rounded-xl border border-[#E5DFD5] space-y-1">
+                  <span className="text-[10px] text-[#78716C] font-mono block">Privacy Tier</span>
+                  <span className="font-bold text-[#15803D]">Shielded Nonce</span>
+                </div>
+                <div className="bg-[#FFFDF9] p-3 rounded-xl border border-[#E5DFD5] space-y-1">
+                  <span className="text-[10px] text-[#78716C] font-mono block">On-Chain State</span>
+                  <span className="font-bold text-[#C2410C]">Immutable Nonce</span>
+                </div>
+              </div>
+
+              <div className="bg-[#FFFDF9] p-3.5 rounded-xl border border-[#E5DFD5] flex items-center justify-between text-xs font-mono">
+                <div className="flex items-center gap-2 text-[#57534E]">
+                  <Lock className="w-3.5 h-3.5 text-[#C2410C]" />
+                  <span>Isolation: Local Browser WASM</span>
+                </div>
+                <span className="text-[10px] bg-[#E5DFD5] text-[#1C1917] px-2 py-0.5 rounded font-bold">Verified</span>
+              </div>
+            </div>
+
           </div>
-
-          {/* Hero ZK Visualizer */}
-          <HeroVisualizer
-            currentSecret={currentSecret}
-            isGenerating={isGenerating}
-            step={provingStep}
-            isVerified={isVerified}
-            eventId={lastEventId}
-          />
-
-          {/* Event Terminal */}
-          <Terminal events={terminalEvents} />
         </div>
 
-        {/* RIGHT COLUMN: ACTION TABS & SIMULATION PANEL */}
-        <div className="lg:col-span-4 space-y-6">
+        {/* DASHBOARD GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Simulation Helper Panel */}
-          <div className="glass-panel rounded-2xl p-5 border border-amber-500/20 bg-amber-500/5 shadow-lg relative overflow-hidden">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 mb-3">
-              <Info className="w-4 h-4 shrink-0" />
-              Developer Simulation Controls
-            </h3>
-            <p className="text-[11px] text-white/60 mb-4 leading-normal">
-              Toggle roles instantly to test both perspectives of the allowlist flow.
-            </p>
+          {/* LEFT COLUMN: HERO VISUALIZER & PUBLIC TERMINAL */}
+          <div className="lg:col-span-8 space-y-8">
+            {/* Hero ZK Visualizer Card */}
+            <HeroVisualizer
+              currentSecret={currentSecret}
+              isGenerating={isGenerating}
+              step={provingStep}
+              isVerified={isVerified}
+              eventId={lastEventId}
+            />
 
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            {/* Public Event Stream Terminal */}
+            <Terminal events={terminalEvents} />
+          </div>
+
+          {/* RIGHT COLUMN: ACTION TABS & SIMULATION CONTROLS */}
+          <div className="lg:col-span-4 space-y-6">
+            
+            {/* Simulator Role Helper Panel */}
+            <div className="cream-card rounded-3xl p-6 border border-[#E5DFD5] bg-[#FFFDF9] shadow-sm relative overflow-hidden">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[#1C1917] flex items-center gap-1.5 mb-2">
+                <Info className="w-4 h-4 shrink-0 text-[#C2410C]" />
+                Simulator Role Controls
+              </h3>
+              <p className="text-xs text-[#57534E] mb-4 leading-relaxed">
+                Switch roles to simulate allowlist registration as Admin or proof verification as Member.
+              </p>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <button
+                  onClick={() => {
+                    setWalletRole('admin');
+                    setActiveTab('admin');
+                    if (!walletConnected) connectWallet();
+                  }}
+                  className={`py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border ${
+                    walletRole === 'admin' && walletConnected
+                      ? 'bg-[#C2410C] border-[#9A3412] text-white shadow-sm'
+                      : 'bg-[#F4EFE6] border-[#E5DFD5] text-[#57534E] hover:text-[#1C1917]'
+                  }`}
+                >
+                  Act as Admin
+                </button>
+                <button
+                  onClick={() => {
+                    setWalletRole('user');
+                    setActiveTab('member');
+                    if (!walletConnected) connectWallet();
+                  }}
+                  className={`py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all border ${
+                    walletRole === 'user' && walletConnected
+                      ? 'bg-[#B45309] border-[#92400E] text-white shadow-sm'
+                      : 'bg-[#F4EFE6] border-[#E5DFD5] text-[#57534E] hover:text-[#1C1917]'
+                  }`}
+                >
+                  Act as Member
+                </button>
+              </div>
+
+              <div className="border-t border-[#E5DFD5] pt-3 flex justify-between items-center text-[11px] font-mono">
+                <span className="text-[#57534E]">Proof Events: <strong className="text-[#1C1917]">{accessCount}</strong></span>
+                <button
+                  onClick={clearLedgerState}
+                  className="text-[#C2410C] hover:text-[#9A3412] font-bold uppercase tracking-wider flex items-center gap-1 transition-all"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  Reset Ledger
+                </button>
+              </div>
+            </div>
+
+            {/* Action Tabs Selector */}
+            <div className="bg-[#F4EFE6] rounded-2xl p-1 flex gap-1 border border-[#E5DFD5]">
               <button
-                onClick={() => {
-                  setWalletRole('admin');
-                  setActiveTab('admin');
-                  if (!walletConnected) connectWallet();
-                }}
-                className={`py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${
-                  walletRole === 'admin' && walletConnected
-                    ? 'bg-amber-500/20 border-amber-500 text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                onClick={() => setActiveTab('member')}
+                className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
+                  activeTab === 'member'
+                    ? 'bg-[#FFFDF9] text-[#1C1917] border border-[#E5DFD5] shadow-sm'
+                    : 'text-[#78716C] hover:text-[#1C1917]'
                 }`}
               >
-                Act as Admin
+                Member Access
               </button>
               <button
-                onClick={() => {
-                  setWalletRole('user');
-                  setActiveTab('member');
-                  if (!walletConnected) connectWallet();
-                }}
-                className={`py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all border ${
-                  walletRole === 'user' && walletConnected
-                    ? 'bg-amber-500/20 border-amber-500 text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                onClick={() => setActiveTab('admin')}
+                className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
+                  activeTab === 'admin'
+                    ? 'bg-[#FFFDF9] text-[#1C1917] border border-[#E5DFD5] shadow-sm'
+                    : 'text-[#78716C] hover:text-[#1C1917]'
                 }`}
               >
-                Act as Member
+                Admin Vault
               </button>
             </div>
 
-            <div className="border-t border-white/5 pt-3 flex justify-between items-center text-[10px]">
-              <span className="text-white/40">Ledger Verifications: {accessCount}</span>
-              <button
-                onClick={clearLedgerState}
-                className="text-red-400 hover:text-red-300 font-bold uppercase tracking-widest flex items-center gap-1 transition-all"
-              >
-                <RefreshCw className="w-3 h-3" />
-                Reset State
-              </button>
+            {/* Tab Cards Rendering */}
+            <div className="min-h-[440px]">
+              {activeTab === 'member' ? (
+                <MemberAccess onProve={handleProveMembership} isConnected={walletConnected} />
+              ) : (
+                <AdminVault
+                  onRegister={handleRegisterCommitment}
+                  commitments={commitments}
+                  maxLeaves={16}
+                  isConnected={walletConnected}
+                  isAdmin={walletRole === 'admin'}
+                />
+              )}
             </div>
-          </div>
 
-          {/* Action Tabs Container */}
-          <div className="glass-panel rounded-2xl p-1.5 flex gap-1 border border-white/5 bg-black/40">
-            <button
-              onClick={() => setActiveTab('member')}
-              className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
-                activeTab === 'member'
-                  ? 'bg-gradient-to-r from-cyberCyan/20 to-midnightViolet/20 border border-cyberCyan/30 text-white'
-                  : 'text-white/50 hover:text-white/80'
-              }`}
-            >
-              Member Access
-            </button>
-            <button
-              onClick={() => setActiveTab('admin')}
-              className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
-                activeTab === 'admin'
-                  ? 'bg-gradient-to-r from-midnightViolet/20 to-cyberCyan/20 border border-midnightViolet/30 text-white'
-                  : 'text-white/50 hover:text-white/80'
-              }`}
-            >
-              Admin Vault
-            </button>
-          </div>
-
-          {/* Tab Content Rendering */}
-          <div className="min-h-[400px]">
-            {activeTab === 'member' ? (
-              <MemberAccess onProve={handleProveMembership} isConnected={walletConnected} />
-            ) : (
-              <AdminVault
-                onRegister={handleRegisterCommitment}
-                commitments={commitments}
-                maxLeaves={16}
-                isConnected={walletConnected}
-                isAdmin={walletRole === 'admin'}
-              />
-            )}
           </div>
 
         </div>
 
       </main>
 
+      {/* WALLET SELECTION MODAL */}
       {showWalletModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-md p-6 rounded-2xl border border-white/10 shadow-2xl relative">
-            <h3 className="text-lg font-bold text-white mb-2">Select Wallet Provider</h3>
-            <p className="text-xs text-white/50 mb-6 font-medium">Choose a wallet to connect to CloakPass.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1C1917]/40 backdrop-blur-sm">
+          <div className="cream-card w-full max-w-md p-6 rounded-3xl border border-[#E5DFD5] shadow-xl relative bg-[#FFFDF9]">
+            <div className="flex items-center gap-2.5 mb-2">
+              <ShieldCheck className="w-5 h-5 text-[#C2410C]" />
+              <h3 className="text-lg font-bold text-[#1C1917]">Select Wallet Provider</h3>
+            </div>
+            <p className="text-xs text-[#57534E] mb-6">Select a Midnight or Stellar compatible wallet to proceed.</p>
             
             <div className="space-y-3">
               {/* Lace Wallet */}
               <button
                 onClick={() => handleWalletSelect('lace')}
-                className="w-full bg-white/5 hover:bg-white/10 border border-white/10 p-4 rounded-xl flex items-center justify-between transition-all group"
+                className="w-full bg-[#F4EFE6] hover:bg-[#E5DFD5]/60 border border-[#E5DFD5] p-4 rounded-xl flex items-center justify-between transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-cyberCyan/20 flex items-center justify-center text-cyberCyan">
-                    <Shield className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-xl bg-[#FFFDF9] border border-[#E5DFD5] flex items-center justify-center text-[#C2410C]">
+                    <Shield className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <div className="text-xs font-bold text-white group-hover:text-cyberCyan transition-colors">Lace Wallet</div>
-                    <span className="text-[10px] text-white/40">Midnight Testnet</span>
+                    <div className="text-xs font-bold text-[#1C1917] group-hover:text-[#C2410C] transition-colors">Lace Wallet</div>
+                    <span className="text-[10px] text-[#78716C] font-mono">Midnight Testnet</span>
                   </div>
                 </div>
-                <span className="text-[10px] text-cyberCyan font-bold uppercase tracking-wider">Connect</span>
+                <span className="text-[10px] text-[#C2410C] font-bold uppercase tracking-wider bg-[#FFFDF9] px-2.5 py-1 rounded border border-[#E5DFD5]">Connect</span>
               </button>
 
               {/* Freighter Wallet */}
               <button
                 onClick={() => handleWalletSelect('freighter')}
-                className="w-full bg-white/5 hover:bg-white/10 border border-white/10 p-4 rounded-xl flex items-center justify-between transition-all group"
+                className="w-full bg-[#F4EFE6] hover:bg-[#E5DFD5]/60 border border-[#E5DFD5] p-4 rounded-xl flex items-center justify-between transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400">
-                    <Wallet className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-xl bg-[#FFFDF9] border border-[#E5DFD5] flex items-center justify-center text-[#B45309]">
+                    <Wallet className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <div className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors">Freighter Wallet</div>
-                    <span className="text-[10px] text-white/40">Stellar Integration</span>
+                    <div className="text-xs font-bold text-[#1C1917] group-hover:text-[#B45309] transition-colors">Freighter Wallet</div>
+                    <span className="text-[10px] text-[#78716C] font-mono">Stellar Integration</span>
                   </div>
                 </div>
-                <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider font-semibold">Connect</span>
+                <span className="text-[10px] text-[#B45309] font-bold uppercase tracking-wider bg-[#FFFDF9] px-2.5 py-1 rounded border border-[#E5DFD5]">Connect</span>
               </button>
 
               {/* Mock Developer Wallet */}
               <button
                 onClick={() => handleWalletSelect('mock')}
-                className="w-full bg-white/5 hover:bg-white/10 border border-white/10 p-4 rounded-xl flex items-center justify-between transition-all group"
+                className="w-full bg-[#F4EFE6] hover:bg-[#E5DFD5]/60 border border-[#E5DFD5] p-4 rounded-xl flex items-center justify-between transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400">
-                    <Cpu className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-xl bg-[#FFFDF9] border border-[#E5DFD5] flex items-center justify-center text-[#57534E]">
+                    <Cpu className="w-5 h-5" />
                   </div>
                   <div className="text-left">
-                    <div className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors">Mock Wallet</div>
-                    <span className="text-[10px] text-white/40">Developer Simulator</span>
+                    <div className="text-xs font-bold text-[#1C1917] group-hover:text-[#1C1917] transition-colors">Mock Wallet</div>
+                    <span className="text-[10px] text-[#78716C] font-mono">Developer Simulator</span>
                   </div>
                 </div>
-                <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider font-semibold">Connect</span>
+                <span className="text-[10px] text-[#57534E] font-bold uppercase tracking-wider bg-[#FFFDF9] px-2.5 py-1 rounded border border-[#E5DFD5]">Connect</span>
               </button>
             </div>
 
             <button
               onClick={() => setShowWalletModal(false)}
-              className="w-full mt-6 bg-white/5 hover:bg-white/10 py-3 rounded-xl text-xs font-semibold text-white/70 transition-colors hover:text-white"
+              className="w-full mt-5 bg-[#F4EFE6] hover:bg-[#E5DFD5] py-2.5 rounded-xl text-xs font-bold text-[#57534E] transition-colors border border-[#E5DFD5]"
             >
               Cancel
             </button>
@@ -475,3 +529,4 @@ export default function App() {
     </div>
   );
 }
+

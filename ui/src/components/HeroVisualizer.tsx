@@ -1,5 +1,5 @@
 import React from 'react';
-import { EyeOff, Cpu, Globe, Lock } from 'lucide-react';
+import { EyeOff, Cpu, Globe, Lock, ShieldAlert, Zap, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface HeroVisualizerProps {
@@ -18,109 +18,166 @@ export const HeroVisualizer: React.FC<HeroVisualizerProps> = ({
   eventId
 }) => {
   return (
-    <div className="glass-panel rounded-2xl p-6 relative overflow-hidden transition-all duration-300 border border-white/10 shadow-2xl">
-      {/* Background ambient light gradients */}
-      <div className="absolute -top-12 -left-12 w-32 h-32 bg-cyberCyan/10 rounded-full blur-2xl pointer-events-none"></div>
-      <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-midnightViolet/10 rounded-full blur-2xl pointer-events-none"></div>
+    <div className="cream-card rounded-3xl p-6 md:p-8 relative overflow-hidden border border-[#E5DFD5] shadow-sm bg-[#FFFDF9]">
+      {/* Card Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-[#E5DFD5]">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#F3EEE6] text-[#C2410C] border border-[#E5DFD5] uppercase tracking-wider">
+              Circuit Topology
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#F3EEE6] text-[#B45309] border border-[#E5DFD5] uppercase tracking-wider flex items-center gap-1">
+              <Zap className="w-3 h-3 text-[#B45309]" /> Dual-State ZK
+            </span>
+          </div>
+          <h2 className="text-2xl font-extrabold text-[#1C1917]">
+            Zero-Knowledge Privacy Boundary Visualizer
+          </h2>
+        </div>
 
-      <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-white">
-        <Cpu className="w-5 h-5 text-cyberCyan animate-pulse" />
-        Zero-Knowledge Privacy Boundary Visualizer
-      </h2>
+        {/* Live Step Badge */}
+        <div className="flex items-center gap-2 bg-[#F4EFE6] border border-[#E5DFD5] px-3.5 py-2 rounded-xl font-mono text-xs text-[#57534E]">
+          <span className="text-[#78716C]">Pipeline:</span>
+          {isGenerating ? (
+            <span className="text-[#C2410C] font-bold flex items-center gap-1.5">
+              <Cpu className="w-3.5 h-3.5 animate-spin" />
+              {step === 1 ? 'Witness Build' : 'Constraint Solving'}
+            </span>
+          ) : isVerified ? (
+            <span className="text-[#15803D] font-bold flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#15803D]" /> Verified On-Chain
+            </span>
+          ) : (
+            <span className="text-[#78716C] italic">Awaiting Proof Request</span>
+          )}
+        </div>
+      </div>
 
+      {/* Flowchart Pipeline Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
         
-        {/* Client Side (Hidden) */}
+        {/* Step 1: Client Private Key Node */}
         <motion.div 
-          className="glass-panel p-4 rounded-xl border border-white/5 relative flex flex-col justify-between"
+          className="bg-[#F4EFE6] p-5 rounded-2xl border border-[#E5DFD5] relative flex flex-col justify-between hover:border-[#D4CBBE] transition-all shadow-sm"
           whileHover={{ translateY: -2 }}
         >
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-white/50 uppercase tracking-widest">Client Side</span>
-              <Lock className="w-4 h-4 text-cyberCyan" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-7 h-7 rounded-lg bg-[#FFFDF9] border border-[#E5DFD5] flex items-center justify-center text-[#C2410C] font-mono font-bold text-xs">
+              01
             </div>
-            <h3 className="text-base font-bold text-cyberCyan mb-2">Shielded Secrets</h3>
-            <p className="text-xs text-white/70 leading-relaxed mb-4">
-              Private data resides purely in the user's browser, never transmitted to the network.
+            <span className="text-[10px] font-mono font-bold text-[#C2410C] uppercase tracking-wider flex items-center gap-1 bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#E5DFD5]">
+              <ShieldAlert className="w-3 h-3 text-[#C2410C]" /> Client Only
+            </span>
+          </div>
+
+          <div className="mb-4">
+            <h3 className="text-sm font-extrabold text-[#1C1917] mb-1 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-[#C2410C]" /> Private Preimage
+            </h3>
+            <p className="text-xs text-[#57534E] leading-relaxed">
+              Passkey and private parameters reside strictly inside local browser memory.
             </p>
           </div>
 
-          <div className="bg-black/40 p-3 rounded-lg border border-white/5 font-mono text-[11px] truncate">
-            <span className="text-white/40">Preimage:</span>{' '}
-            {currentSecret ? (
-              <span className="text-cyberCyan font-bold">●●●●●●●● (Secret Loaded)</span>
-            ) : (
-              <span className="text-white/30 italic">No Passkey Loaded</span>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Midnight Network (ZK Proof Generation) */}
-        <motion.div 
-          className={`glass-panel p-4 rounded-xl border relative flex flex-col justify-between transition-all duration-500 ${
-            isGenerating ? 'border-midnightViolet/50 purple-glow' : 'border-white/5'
-          }`}
-          whileHover={{ translateY: -2 }}
-        >
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-white/50 uppercase tracking-widest">Midnight Shield</span>
-              <EyeOff className="w-4 h-4 text-midnightViolet animate-pulse" />
+          <div className="bg-[#FFFDF9] p-3 rounded-xl border border-[#E5DFD5] font-mono text-[11px] space-y-1">
+            <div className="text-[#78716C] text-[10px] flex justify-between">
+              <span>Memory Location:</span>
+              <span className="text-[#C2410C] font-bold">WASM Isolation</span>
             </div>
-            <h3 className="text-base font-bold text-midnightViolet mb-2">ZK Proof Circuit</h3>
-            <p className="text-xs text-white/70 leading-relaxed mb-4">
-              Compact circuit generates a zero-knowledge proof of allowance membership locally.
-            </p>
-          </div>
-
-          <div className="bg-black/40 p-3 rounded-lg border border-white/5 font-mono text-[11px]">
-            <span className="text-white/40">Status:</span>{' '}
-            {isGenerating ? (
-              <span className="text-midnightViolet font-bold animate-pulse">
-                {step === 1 ? 'Generating Witness...' : 'Computing Proof...'}
-              </span>
-            ) : isVerified ? (
-              <span className="text-emerald-400 font-bold">Proof Verified ✓</span>
-            ) : (
-              <span className="text-white/30 italic">Awaiting Action</span>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Public Ledger (Anonymous Event) */}
-        <motion.div 
-          className={`glass-panel p-4 rounded-xl border relative flex flex-col justify-between transition-all duration-500 ${
-            isVerified ? 'border-emerald-500/30 cyan-glow' : 'border-white/5'
-          }`}
-          whileHover={{ translateY: -2 }}
-        >
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-white/50 uppercase tracking-widest">Public Ledger</span>
-              <Globe className="w-4 h-4 text-emerald-400" />
-            </div>
-            <h3 className="text-base font-bold text-emerald-400 mb-2">Access Granted</h3>
-            <p className="text-xs text-white/70 leading-relaxed mb-4">
-              Only an anonymous event nonce is recorded. Zero links to member addresses or secrets.
-            </p>
-          </div>
-
-          <div className="bg-black/40 p-3 rounded-lg border border-white/5 font-mono text-[10px] leading-tight">
-            <div>
-              <span className="text-white/40">Identity:</span>{' '}
-              {isVerified ? (
-                <span className="text-red-400 font-bold uppercase tracking-wider">[REDACTED]</span>
+            <div className="truncate">
+              <span className="text-[#78716C]">Status:</span>{' '}
+              {currentSecret ? (
+                <span className="text-[#B45309] font-bold tracking-wider">●●●●●●●● (Staged)</span>
               ) : (
-                <span className="text-white/30 italic">Awaiting...</span>
+                <span className="text-[#A8A29E] italic">No Key Loaded</span>
               )}
             </div>
-            {isVerified && eventId && (
-              <div className="mt-1 truncate">
-                <span className="text-white/40">Event ID:</span>{' '}
-                <span className="text-emerald-400 font-bold">{eventId.substring(0, 16)}...</span>
-              </div>
-            )}
+          </div>
+        </motion.div>
+
+        {/* Step 2: Midnight ZK Prover Node */}
+        <motion.div 
+          className={`p-5 rounded-2xl border relative flex flex-col justify-between transition-all duration-300 shadow-sm ${
+            isGenerating ? 'bg-[#FFFDF9] border-[#C2410C]' : 'bg-[#F4EFE6] border-[#E5DFD5]'
+          }`}
+          whileHover={{ translateY: -2 }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-7 h-7 rounded-lg bg-[#FFFDF9] border border-[#E5DFD5] flex items-center justify-center text-[#B45309] font-mono font-bold text-xs">
+              02
+            </div>
+            <span className="text-[10px] font-mono font-bold text-[#B45309] uppercase tracking-wider flex items-center gap-1 bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#E5DFD5]">
+              <Cpu className="w-3 h-3 text-[#B45309]" /> Compact Prover
+            </span>
+          </div>
+
+          <div className="mb-4">
+            <h3 className="text-sm font-extrabold text-[#1C1917] mb-1 flex items-center gap-2">
+              <EyeOff className="w-4 h-4 text-[#B45309]" /> Midnight Circuit
+            </h3>
+            <p className="text-xs text-[#57534E] leading-relaxed">
+              Compact ZK circuit computes allowance membership proof without leaking identity.
+            </p>
+          </div>
+
+          <div className="bg-[#FFFDF9] p-3 rounded-xl border border-[#E5DFD5] font-mono text-[11px] space-y-1">
+            <div className="text-[#78716C] text-[10px] flex justify-between">
+              <span>ZK Engine:</span>
+              <span className="text-[#B45309] font-bold">SNARK Plonk</span>
+            </div>
+            <div className="truncate">
+              <span className="text-[#78716C]">State:</span>{' '}
+              {isGenerating ? (
+                <span className="text-[#C2410C] font-bold">
+                  {step === 1 ? 'Building Witness' : 'Computing Proof'}
+                </span>
+              ) : isVerified ? (
+                <span className="text-[#15803D] font-bold">Proof Verified ✓</span>
+              ) : (
+                <span className="text-[#A8A29E] italic">Ready to Prove</span>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Step 3: Public Ledger Nonce Node */}
+        <motion.div 
+          className={`p-5 rounded-2xl border relative flex flex-col justify-between transition-all duration-300 shadow-sm ${
+            isVerified ? 'bg-[#FFFDF9] border-[#15803D]' : 'bg-[#F4EFE6] border-[#E5DFD5]'
+          }`}
+          whileHover={{ translateY: -2 }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-7 h-7 rounded-lg bg-[#FFFDF9] border border-[#E5DFD5] flex items-center justify-center text-[#15803D] font-mono font-bold text-xs">
+              03
+            </div>
+            <span className="text-[10px] font-mono font-bold text-[#15803D] uppercase tracking-wider flex items-center gap-1 bg-[#FFFDF9] px-2 py-0.5 rounded border border-[#E5DFD5]">
+              <Globe className="w-3 h-3 text-[#15803D]" /> Public State
+            </span>
+          </div>
+
+          <div className="mb-4">
+            <h3 className="text-sm font-extrabold text-[#1C1917] mb-1 flex items-center gap-2">
+              <Globe className="w-4 h-4 text-[#15803D]" /> Access Nonce
+            </h3>
+            <p className="text-xs text-[#57534E] leading-relaxed">
+              Only anonymous event proof is posted on-chain. Address and balance stay private.
+            </p>
+          </div>
+
+          <div className="bg-[#FFFDF9] p-3 rounded-xl border border-[#E5DFD5] font-mono text-[11px] space-y-1">
+            <div className="text-[#78716C] text-[10px] flex justify-between">
+              <span>On-Chain Record:</span>
+              <span className="text-[#15803D] font-bold">100% Anonymous</span>
+            </div>
+            <div className="truncate">
+              <span className="text-[#78716C]">Event ID:</span>{' '}
+              {isVerified && eventId ? (
+                <span className="text-[#1C1917] font-bold">{eventId.substring(0, 14)}...</span>
+              ) : (
+                <span className="text-[#A8A29E] italic">Awaiting Nonce</span>
+              )}
+            </div>
           </div>
         </motion.div>
 
@@ -128,3 +185,4 @@ export const HeroVisualizer: React.FC<HeroVisualizerProps> = ({
     </div>
   );
 };
+
